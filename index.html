@@ -9,8 +9,8 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Serif+Devanagari:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;500&family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
-    <script src="https://unpkg.com/docx@8.5.0/build/index.js"></script>
-    <script src="https://unpkg.com/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/docx@7.8.2/build/index.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
     <style>
       :root {
         --crimson: #8b1a1a;
@@ -1590,6 +1590,10 @@
         await new Promise((r) => setTimeout(r, 100));
 
         try {
+          if (!window.docx)
+            throw new Error(
+              "docx library failed to load. Please check your internet connection and reload.",
+            );
           const {
             Document,
             Packer,
@@ -1604,7 +1608,7 @@
             ShadingType,
             VerticalAlign,
             HeadingLevel,
-          } = docx;
+          } = window.docx;
 
           const complaints = getListVals("complaint-list", true);
           const evidences = getListVals("evidence-list");
@@ -2013,10 +2017,17 @@
           document.getElementById("step-success").classList.add("active");
 
           document.getElementById("dl-btn").onclick = () => {
-            saveAs(
-              generatedBlob,
-              `फिराद_पत्र_${v("wadi-name") || "document"}.docx`,
-            );
+            const filename = `फिराद_पत्र_${v("wadi-name") || "document"}.docx`;
+            if (window.saveAs) {
+              saveAs(generatedBlob, filename);
+            } else {
+              const url = URL.createObjectURL(generatedBlob);
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = filename;
+              a.click();
+              setTimeout(() => URL.revokeObjectURL(url), 1000);
+            }
           };
         } catch (e) {
           console.error(e);
