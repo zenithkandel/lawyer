@@ -667,6 +667,35 @@
       .field.has-error .error-msg {
         display: block;
       }
+
+      .flood-wrap {
+        max-width: 820px;
+        margin: 14px auto 0;
+        padding: 0 20px;
+        display: flex;
+        justify-content: flex-end;
+      }
+      .btn-flood {
+        background: #0f6cbd;
+        color: white;
+        border: none;
+        border-radius: 999px;
+        padding: 10px 16px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 4px 14px rgba(15, 108, 189, 0.25);
+        transition:
+          transform 0.15s,
+          box-shadow 0.15s,
+          background 0.15s;
+        font-family: "Inter", sans-serif;
+      }
+      .btn-flood:hover {
+        background: #005da6;
+        transform: translateY(-1px);
+        box-shadow: 0 7px 18px rgba(15, 108, 189, 0.33);
+      }
     </style>
   </head>
   <body>
@@ -700,6 +729,12 @@
           <span class="step-num">६</span>पुनरावलोकन
         </div>
       </div>
+    </div>
+
+    <div class="flood-wrap">
+      <button class="btn-flood" type="button" onclick="floodInputs()">
+        Flood Inputs
+      </button>
     </div>
 
     <div class="app-wrap">
@@ -1575,6 +1610,148 @@
       function v(id) {
         const el = document.getElementById(id);
         return el ? el.value.trim() : "";
+      }
+
+      function randFrom(items) {
+        return items[Math.floor(Math.random() * items.length)];
+      }
+
+      function randomDigits(length) {
+        return Array.from({ length }, () =>
+          Math.floor(Math.random() * 10),
+        ).join("");
+      }
+
+      function randomNepaliName() {
+        const first = [
+          "राम",
+          "सीता",
+          "हरि",
+          "गीता",
+          "किरण",
+          "सन्तोष",
+          "प्रकाश",
+          "माया",
+        ];
+        const last = ["श्रेष्ठ", "थापा", "पौडेल", "अधिकारी", "खड्का", "गुरुङ"];
+        return `${randFrom(first)} ${randFrom(last)}`;
+      }
+
+      function randomAddress() {
+        const places = [
+          "काठमाडौं",
+          "ललितपुर",
+          "भक्तपुर",
+          "पोखरा",
+          "चितवन",
+          "धादिङ",
+        ];
+        return `वडा ${1 + Math.floor(Math.random() * 20)}, ${randFrom(places)}`;
+      }
+
+      function floodInputs() {
+        const textPickers = {
+          "palika-name": ["तारकेश्वर", "महानगर", "बुढानीलकण्ठ", "पोखरा"],
+          district: ["काठमाडौँ", "ललितपुर", "भक्तपुर", "कास्की"],
+          ward: ["१", "२", "३", "५", "७", "१०"],
+          dastur: ["५००", "१०००", "१५००", "२०००"],
+          "wadi-name": [randomNepaliName(), randomNepaliName()],
+          "wadi-parent": [randomNepaliName(), randomNepaliName()],
+          "wadi-address": [randomAddress(), randomAddress()],
+          "wadi-phone": ["98" + randomDigits(8)],
+          "lawyer-name": ["अधिवक्ता " + randomNepaliName(), ""],
+          "lawyer-cert": ["NB-" + randomDigits(4), ""],
+          "prativ-name": [randomNepaliName(), randomNepaliName()],
+          "prativ-parent": [randomNepaliName(), randomNepaliName()],
+          "prativ-address": [randomAddress(), randomAddress()],
+          "prativ-phone": ["98" + randomDigits(8)],
+          hadmyad: ["३५ दिन", "३ महिना", "१ वर्ष"],
+        };
+
+        const textAreas = {
+          "farad-maag": [
+            "अतिक्रमण हटाई मेरो जग्गा फिर्ता गराई क्षतिपूर्ति समेत दिलाइपाऊँ।",
+            "सम्बन्धित जग्गा विवाद समाधान गरी कानुन बमोजिम न्याय पाऊँ।",
+          ],
+        };
+
+        Object.entries(textPickers).forEach(([id, options]) => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          if (el.type === "number") {
+            el.value = String(18 + Math.floor(Math.random() * 45));
+          } else {
+            el.value = randFrom(options);
+          }
+          el.dispatchEvent(new Event("input", { bubbles: true }));
+        });
+
+        const ageIds = ["wadi-age", "prativ-age"];
+        ageIds.forEach((id) => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          el.value = String(20 + Math.floor(Math.random() * 40));
+          el.dispatchEvent(new Event("input", { bubbles: true }));
+        });
+
+        Object.entries(textAreas).forEach(([id, options]) => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          el.value = randFrom(options);
+          el.dispatchEvent(new Event("input", { bubbles: true }));
+        });
+
+        document.querySelectorAll("select").forEach((sel) => {
+          const validOptions = Array.from(sel.options).filter(
+            (o) => o.value !== "" && !o.disabled,
+          );
+          if (!validOptions.length) return;
+          const picked = randFrom(validOptions);
+          sel.value = picked.value;
+          sel.dispatchEvent(new Event("change", { bubbles: true }));
+        });
+
+        document
+          .querySelectorAll(".field.has-error")
+          .forEach((f) => f.classList.remove("has-error"));
+
+        const complaintFirst = document.querySelector(
+          "#complaint-list .dyn-row textarea",
+        );
+        if (complaintFirst) {
+          complaintFirst.value = randFrom([
+            "प्रतिवादीले मिति २०८१/११/१० मा मेरो जग्गामा सीमा नाघी संरचना बनाएको छ।",
+            "स्थानीय समझदारीबाट समाधान नभएको हुँदा न्यायिक समिति समक्ष फिराद गरेको छु।",
+          ]);
+        }
+
+        const evidenceFirst = document.querySelector(
+          "#evidence-list .dyn-row input",
+        );
+        if (evidenceFirst) {
+          evidenceFirst.value = randFrom([
+            "जग्गाधनी प्रमाण पत्र नक्कल",
+            "नापी नक्सा प्रतिलिपि",
+            "सम्झौता कागज",
+          ]);
+        }
+
+        const witnessFirst = document.querySelector(
+          "#witness-list .dyn-row input",
+        );
+        if (witnessFirst) {
+          witnessFirst.value = `${randomNepaliName()}, ${25 + Math.floor(Math.random() * 30)} वर्ष, ${randomAddress()}`;
+        }
+
+        const dasturFirst = document.querySelector(
+          "#dastur-list .dyn-row input",
+        );
+        if (dasturFirst) {
+          dasturFirst.value = randFrom([
+            "दर्ता दस्तुर बापत रु. ५००",
+            "मुद्दा दर्ता शुल्क रु. १०००",
+          ]);
+        }
       }
 
       // ──────────────────────────────────────────────
