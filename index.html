@@ -1,0 +1,2034 @@
+<!doctype html>
+<html lang="ne">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>फिराद पत्र — Nepal Legal Form Generator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Serif+Devanagari:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;500&family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://unpkg.com/docx@8.5.0/build/index.js"></script>
+    <script src="https://unpkg.com/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+    <style>
+      :root {
+        --crimson: #8b1a1a;
+        --crimson-light: #a52020;
+        --gold: #c9913a;
+        --gold-light: #e8b45a;
+        --cream: #faf7f2;
+        --cream-dark: #f0eae0;
+        --ink: #1a1410;
+        --ink-muted: #4a3d30;
+        --ink-faint: #8a7a6a;
+        --white: #ffffff;
+        --border: #d4c9b8;
+        --step-done: #2e7d32;
+        --shadow: 0 4px 24px rgba(139, 26, 26, 0.1);
+        --radius: 12px;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background: var(--cream);
+        color: var(--ink);
+        min-height: 100vh;
+      }
+
+      /* ─── HEADER ─────────────────────────────────── */
+      header {
+        background: linear-gradient(135deg, var(--crimson) 0%, #5c0f0f 100%);
+        color: white;
+        padding: 28px 40px 24px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        box-shadow: 0 2px 20px rgba(0, 0, 0, 0.25);
+        position: relative;
+        overflow: hidden;
+      }
+      header::before {
+        content: "";
+        position: absolute;
+        top: -40px;
+        right: -40px;
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.04);
+      }
+      header::after {
+        content: "";
+        position: absolute;
+        bottom: -60px;
+        left: 30%;
+        width: 300px;
+        height: 120px;
+        background: rgba(201, 145, 58, 0.12);
+        border-radius: 50%;
+        transform: rotate(-10deg);
+      }
+      .header-emblem {
+        font-size: 48px;
+        filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3));
+        flex-shrink: 0;
+        position: relative;
+        z-index: 1;
+      }
+      .header-text {
+        position: relative;
+        z-index: 1;
+      }
+      .header-text h1 {
+        font-family: "Noto Serif Devanagari", serif;
+        font-size: 26px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        line-height: 1.2;
+      }
+      .header-text p {
+        font-size: 13px;
+        opacity: 0.75;
+        margin-top: 4px;
+        font-family: "Inter", sans-serif;
+      }
+      .header-badge {
+        margin-left: auto;
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: white;
+        font-size: 11px;
+        padding: 5px 12px;
+        border-radius: 20px;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+        font-weight: 600;
+        position: relative;
+        z-index: 1;
+        backdrop-filter: blur(4px);
+      }
+
+      /* ─── PROGRESS ───────────────────────────────── */
+      .progress-bar-wrap {
+        background: var(--crimson-light);
+        padding: 0 40px;
+      }
+      .progress-steps {
+        display: flex;
+        gap: 0;
+        max-width: 780px;
+        margin: 0 auto;
+      }
+      .step-tab {
+        flex: 1;
+        padding: 12px 8px;
+        text-align: center;
+        font-size: 12px;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.5);
+        cursor: pointer;
+        border-bottom: 3px solid transparent;
+        transition: all 0.2s;
+        letter-spacing: 0.3px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .step-tab.active {
+        color: white;
+        border-bottom-color: var(--gold-light);
+      }
+      .step-tab.done {
+        color: rgba(255, 255, 255, 0.75);
+      }
+      .step-tab .step-num {
+        display: inline-flex;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.15);
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        margin-right: 6px;
+        vertical-align: middle;
+      }
+      .step-tab.active .step-num {
+        background: var(--gold);
+        color: var(--crimson);
+      }
+      .step-tab.done .step-num {
+        background: rgba(255, 255, 255, 0.3);
+      }
+
+      /* ─── MAIN LAYOUT ────────────────────────────── */
+      .app-wrap {
+        max-width: 820px;
+        margin: 36px auto 60px;
+        padding: 0 20px;
+      }
+
+      /* ─── CARD ───────────────────────────────────── */
+      .card {
+        background: white;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+      .card-header {
+        background: linear-gradient(90deg, var(--cream-dark), var(--cream));
+        border-bottom: 1px solid var(--border);
+        padding: 20px 32px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+      .card-icon {
+        width: 40px;
+        height: 40px;
+        background: var(--crimson);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        flex-shrink: 0;
+      }
+      .card-header h2 {
+        font-family: "Noto Serif Devanagari", serif;
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--ink);
+      }
+      .card-header p {
+        font-size: 12.5px;
+        color: var(--ink-faint);
+        margin-top: 2px;
+      }
+      .card-body {
+        padding: 32px;
+      }
+
+      /* ─── FORM ELEMENTS ──────────────────────────── */
+      .form-section {
+        margin-bottom: 28px;
+      }
+      .section-title {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        color: var(--crimson);
+        margin-bottom: 16px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--cream-dark);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .section-title::before {
+        content: "";
+        width: 3px;
+        height: 14px;
+        background: var(--gold);
+        border-radius: 2px;
+        display: inline-block;
+      }
+
+      .field-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-bottom: 16px;
+      }
+      .field-row.single {
+        grid-template-columns: 1fr;
+      }
+      .field-row.triple {
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      label {
+        font-size: 12.5px;
+        font-weight: 600;
+        color: var(--ink-muted);
+        letter-spacing: 0.2px;
+      }
+      label .ne {
+        font-family: "Noto Sans Devanagari", sans-serif;
+        font-size: 11.5px;
+        color: var(--ink-faint);
+        font-weight: 400;
+        display: block;
+        margin-top: 1px;
+      }
+      label .req {
+        color: var(--crimson);
+        margin-left: 2px;
+      }
+
+      input[type="text"],
+      input[type="number"],
+      input[type="date"],
+      select,
+      textarea {
+        border: 1.5px solid var(--border);
+        border-radius: 8px;
+        padding: 10px 14px;
+        font-size: 14px;
+        font-family: "Inter", sans-serif;
+        color: var(--ink);
+        background: white;
+        transition:
+          border-color 0.2s,
+          box-shadow 0.2s;
+        outline: none;
+        width: 100%;
+      }
+      input:focus,
+      select:focus,
+      textarea:focus {
+        border-color: var(--crimson);
+        box-shadow: 0 0 0 3px rgba(139, 26, 26, 0.08);
+      }
+      textarea {
+        resize: vertical;
+        min-height: 90px;
+        line-height: 1.6;
+      }
+      .nepali-input {
+        font-family: "Noto Sans Devanagari", sans-serif;
+        font-size: 15px;
+      }
+
+      .input-hint {
+        font-size: 11.5px;
+        color: var(--ink-faint);
+        margin-top: 2px;
+      }
+
+      /* ─── ADD/REMOVE ROWS ────────────────────────── */
+      .dynamic-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .dyn-row {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+      }
+      .dyn-row .num-badge {
+        width: 26px;
+        height: 26px;
+        min-width: 26px;
+        background: var(--cream-dark);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--ink-muted);
+        margin-top: 10px;
+      }
+      .dyn-row input,
+      .dyn-row textarea {
+        flex: 1;
+      }
+      .btn-remove {
+        background: none;
+        border: 1.5px solid #eacaca;
+        color: #c04040;
+        border-radius: 6px;
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+        cursor: pointer;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 8px;
+        transition: all 0.15s;
+      }
+      .btn-remove:hover {
+        background: #ffeaea;
+        border-color: #c04040;
+      }
+      .btn-add {
+        background: none;
+        border: 1.5px dashed var(--border);
+        color: var(--ink-muted);
+        border-radius: 8px;
+        padding: 9px 16px;
+        font-size: 13px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 8px;
+        transition: all 0.15s;
+        font-family: "Inter", sans-serif;
+      }
+      .btn-add:hover {
+        border-color: var(--crimson);
+        color: var(--crimson);
+        background: #fff5f5;
+      }
+
+      /* ─── NAV BUTTONS ────────────────────────────── */
+      .nav-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 32px;
+        padding-top: 24px;
+        border-top: 1px solid var(--cream-dark);
+      }
+      .btn-back {
+        background: white;
+        border: 1.5px solid var(--border);
+        color: var(--ink-muted);
+        padding: 11px 24px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.15s;
+        font-family: "Inter", sans-serif;
+      }
+      .btn-back:hover {
+        border-color: var(--ink-muted);
+        background: var(--cream);
+      }
+      .btn-next {
+        background: var(--crimson);
+        color: white;
+        border: none;
+        padding: 11px 28px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.15s;
+        font-family: "Inter", sans-serif;
+        box-shadow: 0 2px 8px rgba(139, 26, 26, 0.2);
+      }
+      .btn-next:hover {
+        background: var(--crimson-light);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 16px rgba(139, 26, 26, 0.3);
+      }
+      .btn-generate {
+        background: linear-gradient(135deg, var(--gold) 0%, #a8721c 100%);
+        color: white;
+        border: none;
+        padding: 13px 32px;
+        border-radius: 8px;
+        font-size: 15px;
+        font-weight: 700;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.2s;
+        font-family: "Inter", sans-serif;
+        box-shadow: 0 2px 12px rgba(201, 145, 58, 0.35);
+        letter-spacing: 0.3px;
+      }
+      .btn-generate:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 24px rgba(201, 145, 58, 0.45);
+      }
+
+      /* ─── STEPS VISIBILITY ───────────────────────── */
+      .step-view {
+        display: none;
+      }
+      .step-view.active {
+        display: block;
+      }
+
+      /* ─── REVIEW CARD ────────────────────────────── */
+      .review-grid {
+        display: grid;
+        gap: 16px;
+      }
+      .review-block {
+        background: var(--cream);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 16px 20px;
+      }
+      .review-block h4 {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1.1px;
+        color: var(--crimson);
+        margin-bottom: 10px;
+      }
+      .review-row {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 6px;
+        font-size: 13.5px;
+      }
+      .review-row .rk {
+        color: var(--ink-faint);
+        min-width: 160px;
+        font-size: 12.5px;
+      }
+      .review-row .rv {
+        color: var(--ink);
+        font-weight: 500;
+        font-family: "Noto Sans Devanagari", sans-serif;
+      }
+
+      /* ─── SUCCESS STATE ──────────────────────────── */
+      .success-box {
+        text-align: center;
+        padding: 48px 32px;
+      }
+      .success-icon {
+        font-size: 64px;
+        margin-bottom: 16px;
+      }
+      .success-box h2 {
+        font-family: "Noto Serif Devanagari", serif;
+        font-size: 22px;
+        color: var(--step-done);
+        margin-bottom: 8px;
+      }
+      .success-box p {
+        color: var(--ink-faint);
+        font-size: 14px;
+        margin-bottom: 28px;
+      }
+      .success-actions {
+        display: flex;
+        justify-content: center;
+        gap: 14px;
+        flex-wrap: wrap;
+      }
+      .btn-download {
+        background: var(--step-done);
+        color: white;
+        border: none;
+        padding: 13px 32px;
+        border-radius: 8px;
+        font-size: 15px;
+        font-weight: 700;
+        cursor: pointer;
+        font-family: "Inter", sans-serif;
+        box-shadow: 0 2px 12px rgba(46, 125, 50, 0.3);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.2s;
+      }
+      .btn-download:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 24px rgba(46, 125, 50, 0.4);
+      }
+      .btn-new {
+        background: white;
+        color: var(--crimson);
+        border: 1.5px solid var(--crimson);
+        padding: 12px 28px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: "Inter", sans-serif;
+        transition: all 0.15s;
+      }
+      .btn-new:hover {
+        background: #fff5f5;
+      }
+
+      /* ─── NEPALI DATE ROW ────────────────────────── */
+      .bs-row {
+        display: flex;
+        gap: 10px;
+      }
+      .bs-row select {
+        flex: 1;
+      }
+      .bs-label {
+        font-size: 12px;
+        color: var(--ink-faint);
+        margin-bottom: 4px;
+      }
+
+      /* ─── INFO BOX ───────────────────────────────── */
+      .info-box {
+        background: #fff8e7;
+        border: 1px solid #e8c97c;
+        border-radius: 8px;
+        padding: 14px 18px;
+        font-size: 13px;
+        color: #6b4c12;
+        margin-bottom: 20px;
+        display: flex;
+        gap: 10px;
+      }
+      .info-box .info-icon {
+        font-size: 16px;
+        flex-shrink: 0;
+      }
+
+      /* ─── RESPONSIVE ─────────────────────────────── */
+      @media (max-width: 600px) {
+        header {
+          padding: 20px;
+          gap: 14px;
+        }
+        .header-badge {
+          display: none;
+        }
+        .progress-bar-wrap {
+          padding: 0 10px;
+        }
+        .step-tab {
+          font-size: 10px;
+          padding: 10px 4px;
+        }
+        .step-tab .step-num {
+          display: none;
+        }
+        .app-wrap {
+          padding: 0 12px;
+          margin-top: 24px;
+        }
+        .card-body {
+          padding: 20px;
+        }
+        .field-row {
+          grid-template-columns: 1fr;
+        }
+        .field-row.triple {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* ─── GENERATING SPINNER ─────────────────────── */
+      .spinner {
+        display: none;
+        width: 20px;
+        height: 20px;
+        border: 2px solid rgba(255, 255, 255, 0.4);
+        border-top-color: white;
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .generating .spinner {
+        display: block;
+      }
+      .generating .btn-icon {
+        display: none;
+      }
+
+      .error-msg {
+        color: var(--crimson);
+        font-size: 13px;
+        margin-top: 5px;
+        display: none;
+      }
+      .field.has-error input,
+      .field.has-error textarea,
+      .field.has-error select {
+        border-color: var(--crimson);
+      }
+      .field.has-error .error-msg {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="header-emblem">⚖️</div>
+      <div class="header-text">
+        <h1>फिराद पत्र जेनेरेटर</h1>
+        <p>Firad Patra Generator — Nepal Local Judicial Committee</p>
+      </div>
+      <div class="header-badge">FREE · OFFLINE</div>
+    </header>
+
+    <div class="progress-bar-wrap">
+      <div class="progress-steps">
+        <div class="step-tab active" onclick="goToStep(0)">
+          <span class="step-num">१</span>दर्ता स्थान
+        </div>
+        <div class="step-tab" onclick="goToStep(1)">
+          <span class="step-num">२</span>वादी
+        </div>
+        <div class="step-tab" onclick="goToStep(2)">
+          <span class="step-num">३</span>प्रतिवादी
+        </div>
+        <div class="step-tab" onclick="goToStep(3)">
+          <span class="step-num">४</span>फिराद विवरण
+        </div>
+        <div class="step-tab" onclick="goToStep(4)">
+          <span class="step-num">५</span>प्रमाण/साक्षी
+        </div>
+        <div class="step-tab" onclick="goToStep(5)">
+          <span class="step-num">६</span>पुनरावलोकन
+        </div>
+      </div>
+    </div>
+
+    <div class="app-wrap">
+      <div class="card">
+        <!-- ════════════════════════════════════════════ -->
+        <!-- STEP 1: Registration Place                  -->
+        <!-- ════════════════════════════════════════════ -->
+        <div class="step-view active" id="step-0">
+          <div class="card-header">
+            <div class="card-icon">🏛️</div>
+            <div>
+              <h2>दर्ता स्थानको विवरण</h2>
+              <p>Where is this FIR being registered?</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="info-box">
+              <span class="info-icon">ℹ️</span>
+              <span
+                >फिराद पत्र स्थानीय सरकार संञ्चालन ऐन २०७४ बमोजिम न्यायिक समिति
+                वा न्यायिक कार्यसमितिमा दायर गरिन्छ।</span
+              >
+            </div>
+
+            <div class="form-section">
+              <div class="section-title">न्यायिक निकायको विवरण</div>
+              <div class="field-row">
+                <div class="field" id="f-palika-type">
+                  <label
+                    >स्थानीय तह / Local Level <span class="req">*</span>
+                    <span class="ne"
+                      >नगरपालिका / गाउँपालिका / महानगरपालिका</span
+                    >
+                  </label>
+                  <select id="palika-type">
+                    <option value="">-- छान्नुहोस् / Select --</option>
+                    <option value="महानगरपालिका">
+                      महानगरपालिका (Metropolitan)
+                    </option>
+                    <option value="उपमहानगरपालिका">
+                      उपमहानगरपालिका (Sub-Metropolitan)
+                    </option>
+                    <option value="नगरपालिका">नगरपालिका (Municipality)</option>
+                    <option value="गाउँपालिका">
+                      गाउँपालिका (Rural Municipality)
+                    </option>
+                  </select>
+                  <span class="error-msg">कृपया स्थानीय तह छान्नुहोस्।</span>
+                </div>
+                <div class="field" id="f-palika-name">
+                  <label
+                    >नाम / Name <span class="req">*</span>
+                    <span class="ne">जस्तै: तारकेश्वर नगरपालिका</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="palika-name"
+                    class="nepali-input"
+                    placeholder="जस्तै: तारकेश्वर"
+                  />
+                  <span class="error-msg">कृपया नाम भर्नुहोस्।</span>
+                </div>
+              </div>
+              <div class="field-row triple">
+                <div class="field" id="f-district">
+                  <label>जिल्ला / District <span class="req">*</span></label>
+                  <input
+                    type="text"
+                    id="district"
+                    class="nepali-input"
+                    placeholder="जस्तै: काठमाडौँ"
+                  />
+                  <span class="error-msg">जिल्ला भर्नुहोस्।</span>
+                </div>
+                <div class="field">
+                  <label>प्रदेश / Province</label>
+                  <select id="province">
+                    <option value="">-- छान्नुहोस् --</option>
+                    <option>कोशी प्रदेश</option>
+                    <option>मधेश प्रदेश</option>
+                    <option>बागमती प्रदेश</option>
+                    <option>गण्डकी प्रदेश</option>
+                    <option>लुम्बिनी प्रदेश</option>
+                    <option>कर्णाली प्रदेश</option>
+                    <option>सुदूरपश्चिम प्रदेश</option>
+                  </select>
+                </div>
+                <div class="field" id="f-ward">
+                  <label>वडा नं / Ward No <span class="req">*</span></label>
+                  <input
+                    type="text"
+                    id="ward"
+                    placeholder="जस्तै: ५"
+                    style="
+                      font-family: &quot;Noto Sans Devanagari&quot;, sans-serif;
+                    "
+                  />
+                  <span class="error-msg">वडा नं भर्नुहोस्।</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <div class="section-title">मुद्दाको प्रकार</div>
+              <div class="field-row">
+                <div class="field" id="f-mudda-type">
+                  <label
+                    >मुद्दाको किसिम / Type of Case
+                    <span class="req">*</span></label
+                  >
+                  <select id="mudda-type">
+                    <option value="">-- छान्नुहोस् --</option>
+                    <option value="सार्वजनिक जग्गा अतिक्रमण">
+                      सार्वजनिक जग्गा अतिक्रमण (Land Encroachment)
+                    </option>
+                    <option value="पारिवारिक विवाद">
+                      पारिवारिक विवाद (Family Dispute)
+                    </option>
+                    <option value="जग्गा विवाद">
+                      जग्गा विवाद (Property Dispute)
+                    </option>
+                    <option value="पानी पँधेरो विवाद">
+                      पानी पँधेरो विवाद (Water/Path Dispute)
+                    </option>
+                    <option value="ऋण असुली">ऋण असुली (Debt Recovery)</option>
+                    <option value="घर भाडा विवाद">
+                      घर भाडा विवाद (Rent Dispute)
+                    </option>
+                    <option value="कारोबार विवाद">
+                      कारोबार विवाद (Trade/Business Dispute)
+                    </option>
+                    <option value="अन्य सिभिल विवाद">
+                      अन्य सिभिल विवाद (Other Civil Dispute)
+                    </option>
+                  </select>
+                  <span class="error-msg">मुद्दाको किसिम छान्नुहोस्।</span>
+                </div>
+                <div class="field">
+                  <label>दस्तुर / Filing Fee (रु)</label>
+                  <input type="text" id="dastur" placeholder="जस्तै: १०००" />
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <div class="section-title">दायर मिति — Filing Date (B.S.)</div>
+              <div class="field-row triple">
+                <div class="field">
+                  <label>साल / Year</label>
+                  <select id="bs-year"></select>
+                </div>
+                <div class="field">
+                  <label>महिना / Month</label>
+                  <select id="bs-month">
+                    <option value="बैशाख">बैशाख (1)</option>
+                    <option value="जेष्ठ">जेष्ठ (2)</option>
+                    <option value="आषाढ">आषाढ (3)</option>
+                    <option value="श्रावण">श्रावण (4)</option>
+                    <option value="भाद्र">भाद्र (5)</option>
+                    <option value="आश्विन">आश्विन (6)</option>
+                    <option value="कार्तिक">कार्तिक (7)</option>
+                    <option value="मंसिर">मंसिर (8)</option>
+                    <option value="पौष">पौष (9)</option>
+                    <option value="माघ">माघ (10)</option>
+                    <option value="फाल्गुण">फाल्गुण (11)</option>
+                    <option value="चैत्र" selected>चैत्र (12)</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label>गते / Day</label>
+                  <select id="bs-day"></select>
+                </div>
+              </div>
+            </div>
+
+            <div class="nav-row">
+              <div></div>
+              <button class="btn-next" onclick="nextStep(0)">
+                अर्को <span>→</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ════════════════════════════════════════════ -->
+        <!-- STEP 2: Plaintiff (Wadi)                    -->
+        <!-- ════════════════════════════════════════════ -->
+        <div class="step-view" id="step-1">
+          <div class="card-header">
+            <div class="card-icon">👤</div>
+            <div>
+              <h2>वादीको विवरण</h2>
+              <p>Plaintiff / Complainant Details</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="form-section">
+              <div class="section-title">मुख्य वादी — Primary Plaintiff</div>
+              <div class="field-row">
+                <div class="field" id="f-wadi-name">
+                  <label>पूरा नाम / Full Name <span class="req">*</span></label>
+                  <input
+                    type="text"
+                    id="wadi-name"
+                    class="nepali-input"
+                    placeholder="पूरा नाम लेख्नुहोस्"
+                  />
+                  <span class="error-msg">वादीको नाम भर्नुहोस्।</span>
+                </div>
+                <div class="field">
+                  <label>नाताको सम्बन्ध / Relation</label>
+                  <select id="wadi-relation">
+                    <option value="छोरा">छोरा (Son)</option>
+                    <option value="छोरी">छोरी (Daughter)</option>
+                    <option value="पति">पति (Husband)</option>
+                    <option value="पत्नी">पत्नी (Wife)</option>
+                  </select>
+                </div>
+              </div>
+              <div class="field-row">
+                <div class="field" id="f-wadi-parent">
+                  <label
+                    >बाबु/आमा/श्रीमान/श्रीमतीको नाम
+                    <span class="req">*</span></label
+                  >
+                  <input
+                    type="text"
+                    id="wadi-parent"
+                    class="nepali-input"
+                    placeholder="अभिभावकको नाम"
+                  />
+                  <span class="error-msg">अभिभावकको नाम भर्नुहोस्।</span>
+                </div>
+                <div class="field" id="f-wadi-age">
+                  <label>उमेर / Age <span class="req">*</span></label>
+                  <input
+                    type="number"
+                    id="wadi-age"
+                    placeholder="उमेर"
+                    min="18"
+                    max="120"
+                  />
+                  <span class="error-msg">उमेर भर्नुहोस्।</span>
+                </div>
+              </div>
+              <div class="field-row">
+                <div class="field" id="f-wadi-address">
+                  <label>ठेगाना / Address <span class="req">*</span></label>
+                  <input
+                    type="text"
+                    id="wadi-address"
+                    class="nepali-input"
+                    placeholder="वडा, गाउँ/शहर, जिल्ला"
+                  />
+                  <span class="error-msg">ठेगाना भर्नुहोस्।</span>
+                </div>
+                <div class="field">
+                  <label>सम्पर्क नम्बर / Phone</label>
+                  <input type="text" id="wadi-phone" placeholder="९८XXXXXXXX" />
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <div class="section-title">
+                कानून व्यवसायी (भए) — Lawyer (if any)
+              </div>
+              <div class="field-row">
+                <div class="field">
+                  <label>वकिलको नाम / Lawyer Name</label>
+                  <input
+                    type="text"
+                    id="lawyer-name"
+                    class="nepali-input"
+                    placeholder="वकिलको नाम (वैकल्पिक)"
+                  />
+                </div>
+                <div class="field">
+                  <label>प्रमाणपत्र नं / License No</label>
+                  <input
+                    type="text"
+                    id="lawyer-cert"
+                    placeholder="जस्तै: NB-XXXX"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="nav-row">
+              <button class="btn-back" onclick="prevStep(1)">← पछि</button>
+              <button class="btn-next" onclick="nextStep(1)">अर्को →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ════════════════════════════════════════════ -->
+        <!-- STEP 3: Defendant (Prativadi)               -->
+        <!-- ════════════════════════════════════════════ -->
+        <div class="step-view" id="step-2">
+          <div class="card-header">
+            <div class="card-icon">👥</div>
+            <div>
+              <h2>प्रतिवादीको विवरण</h2>
+              <p>Defendant / Respondent Details</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="form-section">
+              <div class="section-title">
+                मुख्य प्रतिवादी — Primary Defendant
+              </div>
+              <div class="field-row">
+                <div class="field" id="f-prativ-name">
+                  <label>पूरा नाम / Full Name <span class="req">*</span></label>
+                  <input
+                    type="text"
+                    id="prativ-name"
+                    class="nepali-input"
+                    placeholder="पूरा नाम लेख्नुहोस्"
+                  />
+                  <span class="error-msg">प्रतिवादीको नाम भर्नुहोस्।</span>
+                </div>
+                <div class="field">
+                  <label>नाताको सम्बन्ध / Relation</label>
+                  <select id="prativ-relation">
+                    <option value="छोरा">छोरा (Son)</option>
+                    <option value="छोरी">छोरी (Daughter)</option>
+                    <option value="पति">पति (Husband)</option>
+                    <option value="पत्नी">पत्नी (Wife)</option>
+                  </select>
+                </div>
+              </div>
+              <div class="field-row">
+                <div class="field" id="f-prativ-parent">
+                  <label
+                    >बाबु/आमा/श्रीमान/श्रीमतीको नाम
+                    <span class="req">*</span></label
+                  >
+                  <input
+                    type="text"
+                    id="prativ-parent"
+                    class="nepali-input"
+                    placeholder="अभिभावकको नाम"
+                  />
+                  <span class="error-msg">अभिभावकको नाम भर्नुहोस्।</span>
+                </div>
+                <div class="field" id="f-prativ-age">
+                  <label>उमेर / Age <span class="req">*</span></label>
+                  <input
+                    type="number"
+                    id="prativ-age"
+                    placeholder="उमेर"
+                    min="1"
+                    max="120"
+                  />
+                  <span class="error-msg">उमेर भर्नुहोस्।</span>
+                </div>
+              </div>
+              <div class="field-row">
+                <div class="field" id="f-prativ-address">
+                  <label>ठेगाना / Address <span class="req">*</span></label>
+                  <input
+                    type="text"
+                    id="prativ-address"
+                    class="nepali-input"
+                    placeholder="वडा, गाउँ/शहर, जिल्ला"
+                  />
+                  <span class="error-msg">ठेगाना भर्नुहोस्।</span>
+                </div>
+                <div class="field">
+                  <label>सम्पर्क नम्बर / Phone</label>
+                  <input
+                    type="text"
+                    id="prativ-phone"
+                    placeholder="९८XXXXXXXX"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <div class="section-title">म्याद तामेल — Summons Method</div>
+              <div class="field-row single">
+                <div class="field">
+                  <label>म्याद तामेल गर्ने तरिका / Summons Delivery</label>
+                  <select id="myad">
+                    <option value="आफैँले">
+                      वादी आफैँले (By Plaintiff in Person)
+                    </option>
+                    <option value="कानून व्यवसायी मार्फत">
+                      कानून व्यवसायी मार्फत (Through Lawyer)
+                    </option>
+                    <option value="न्यायिक समितिबाट">
+                      न्यायिक समितिबाट (Through Judicial Committee)
+                    </option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="nav-row">
+              <button class="btn-back" onclick="prevStep(2)">← पछि</button>
+              <button class="btn-next" onclick="nextStep(2)">अर्को →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ════════════════════════════════════════════ -->
+        <!-- STEP 4: Complaint Details                   -->
+        <!-- ════════════════════════════════════════════ -->
+        <div class="step-view" id="step-3">
+          <div class="card-header">
+            <div class="card-icon">📋</div>
+            <div>
+              <h2>फिरादको विषयवस्तु</h2>
+              <p>Complaint Details &amp; Claims</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="form-section">
+              <div class="section-title">
+                फिरादको मुख्य विवरण — Main Complaint Points
+              </div>
+              <p class="input-hint" style="margin-bottom: 14px">
+                घटनाको विस्तृत विवरण, मिति, ठाउँ, र प्रतिवादीले के गरेको हो
+                लेख्नुहोस्।
+              </p>
+              <div class="dynamic-list" id="complaint-list">
+                <div class="dyn-row">
+                  <div class="num-badge">क</div>
+                  <textarea
+                    class="nepali-input"
+                    placeholder="पहिलो बुँदा — घटनाको विवरण लेख्नुहोस्..."
+                    rows="3"
+                  ></textarea>
+                  <button
+                    class="btn-remove"
+                    onclick="removeRow(this)"
+                    title="हटाउनुहोस्"
+                  >
+                    ×
+                  </button>
+                </div>
+              </div>
+              <button class="btn-add" onclick="addComplaintRow()">
+                + अर्को बुँदा थप्नुहोस्
+              </button>
+            </div>
+
+            <div class="form-section">
+              <div class="section-title">फिरादको माग — Relief Sought</div>
+              <div class="field-row single">
+                <div class="field" id="f-farad-maag">
+                  <label
+                    >के माग गर्नु भएको छ? / What relief do you seek?
+                    <span class="req">*</span></label
+                  >
+                  <textarea
+                    id="farad-maag"
+                    class="nepali-input"
+                    rows="3"
+                    placeholder="जस्तै: अतिक्रमण हटाई मेरो जग्गा फिर्ता गराई पाऊँ, क्षतिपूर्ति दिलाइपाऊँ..."
+                  ></textarea>
+                  <span class="error-msg">फिरादको माग लेख्नुहोस्।</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <div class="section-title">हदम्याद — Limitation Period</div>
+              <div class="field-row">
+                <div class="field">
+                  <label>हदम्याद अवधि / Limitation</label>
+                  <input
+                    type="text"
+                    id="hadmyad"
+                    class="nepali-input"
+                    placeholder="जस्तै: ३ वर्ष / ३५ दिन"
+                  />
+                </div>
+                <div class="field">
+                  <label>अन्यत्र फिराद? / Filed elsewhere?</label>
+                  <select id="anyatra">
+                    <option value="छैन">छैन (No)</option>
+                    <option value="छ">छ (Yes)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="nav-row">
+              <button class="btn-back" onclick="prevStep(3)">← पछि</button>
+              <button class="btn-next" onclick="nextStep(3)">अर्को →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ════════════════════════════════════════════ -->
+        <!-- STEP 5: Evidence & Witnesses                -->
+        <!-- ════════════════════════════════════════════ -->
+        <div class="step-view" id="step-4">
+          <div class="card-header">
+            <div class="card-icon">📁</div>
+            <div>
+              <h2>प्रमाण र साक्षी</h2>
+              <p>Evidence Documents &amp; Witnesses</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="form-section">
+              <div class="section-title">
+                प्रमाणका कागजातहरू — Evidence Documents
+              </div>
+              <div class="dynamic-list" id="evidence-list">
+                <div class="dyn-row">
+                  <div class="num-badge">क</div>
+                  <input
+                    type="text"
+                    class="nepali-input"
+                    placeholder="जस्तै: जग्गाधनी प्रमाण पत्र नक्कल"
+                  />
+                  <button
+                    class="btn-remove"
+                    onclick="removeRow(this)"
+                    title="हटाउनुहोस्"
+                  >
+                    ×
+                  </button>
+                </div>
+              </div>
+              <button class="btn-add" onclick="addEvidenceRow()">
+                + अर्को प्रमाण थप्नुहोस्
+              </button>
+            </div>
+
+            <div class="form-section">
+              <div class="section-title">साक्षीहरू — Witnesses</div>
+              <div class="dynamic-list" id="witness-list">
+                <div class="dyn-row">
+                  <div class="num-badge">क</div>
+                  <input
+                    type="text"
+                    class="nepali-input"
+                    placeholder="पूरा नाम, उमेर र ठेगाना"
+                  />
+                  <button
+                    class="btn-remove"
+                    onclick="removeRow(this)"
+                    title="हटाउनुहोस्"
+                  >
+                    ×
+                  </button>
+                </div>
+              </div>
+              <button class="btn-add" onclick="addWitnessRow()">
+                + अर्को साक्षी थप्नुहोस्
+              </button>
+            </div>
+
+            <div class="form-section">
+              <div class="section-title">दस्तुर विवरण — Fee Details</div>
+              <div class="dynamic-list" id="dastur-list">
+                <div class="dyn-row">
+                  <div class="num-badge">क</div>
+                  <input
+                    type="text"
+                    class="nepali-input"
+                    placeholder="दस्तुरको विवरण र रकम जस्तै: दर्ता दस्तुर बापत रु. ५००"
+                  />
+                  <button
+                    class="btn-remove"
+                    onclick="removeRow(this)"
+                    title="हटाउनुहोस्"
+                  >
+                    ×
+                  </button>
+                </div>
+              </div>
+              <button class="btn-add" onclick="addDasturRow()">
+                + अर्को दस्तुर थप्नुहोस्
+              </button>
+            </div>
+
+            <div class="nav-row">
+              <button class="btn-back" onclick="prevStep(4)">← पछि</button>
+              <button class="btn-next" onclick="nextStep(4)">
+                पुनरावलोकन →
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ════════════════════════════════════════════ -->
+        <!-- STEP 6: Review                              -->
+        <!-- ════════════════════════════════════════════ -->
+        <div class="step-view" id="step-5">
+          <div class="card-header">
+            <div class="card-icon">✅</div>
+            <div>
+              <h2>पुनरावलोकन गर्नुहोस्</h2>
+              <p>Review before generating your document</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="review-grid" id="review-content"></div>
+            <div class="nav-row">
+              <button class="btn-back" onclick="prevStep(5)">← सम्पादन</button>
+              <button class="btn-generate" id="gen-btn" onclick="generateDoc()">
+                <span class="btn-icon">📄</span>
+                <span class="spinner"></span>
+                फिराद पत्र बनाउनुहोस्
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ════════════════════════════════════════════ -->
+        <!-- SUCCESS VIEW                                -->
+        <!-- ════════════════════════════════════════════ -->
+        <div class="step-view" id="step-success">
+          <div class="success-box">
+            <div class="success-icon">📄</div>
+            <h2>फिराद पत्र तयार छ!</h2>
+            <p>
+              Your Firad Patra has been generated successfully. Click the button
+              below to download the Word document.
+            </p>
+            <div class="success-actions">
+              <button class="btn-download" id="dl-btn">
+                ⬇️ &nbsp;.docx डाउनलोड गर्नुहोस्
+              </button>
+              <button class="btn-new" onclick="resetForm()">नयाँ फिराद</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- .card -->
+    </div>
+    <!-- .app-wrap -->
+
+    <script>
+      // ──────────────────────────────────────────────
+      // NEPALI NUMERALS
+      // ──────────────────────────────────────────────
+      const ne = (n) => String(n).replace(/[0-9]/g, (d) => "०१२३४५६७८९"[d]);
+      const en = (n) =>
+        String(n).replace(/[०-९]/g, (d) =>
+          "0123456789".indexOf(d) < 0
+            ? d
+            : "0123456789"["०१२३४५६७८९".indexOf(d)],
+        );
+
+      // ──────────────────────────────────────────────
+      // POPULATE YEAR/DAY DROPDOWNS
+      // ──────────────────────────────────────────────
+      const yrSel = document.getElementById("bs-year");
+      for (let y = 2082; y >= 2070; y--) {
+        const o = document.createElement("option");
+        o.value = ne(y);
+        o.textContent = ne(y);
+        if (y === 2081) o.selected = true;
+        yrSel.appendChild(o);
+      }
+      const daySel = document.getElementById("bs-day");
+      for (let d = 1; d <= 32; d++) {
+        const o = document.createElement("option");
+        o.value = ne(d);
+        o.textContent = ne(d);
+        if (d === 1) o.selected = true;
+        daySel.appendChild(o);
+      }
+
+      // ──────────────────────────────────────────────
+      // STEP NAVIGATION
+      // ──────────────────────────────────────────────
+      let currentStep = 0;
+      const totalSteps = 6;
+
+      const NEPALI_LABELS = ["क", "ख", "ग", "घ", "ङ", "च", "छ", "ज", "झ", "ञ"];
+
+      function updateTabs() {
+        document.querySelectorAll(".step-tab").forEach((t, i) => {
+          t.classList.remove("active", "done");
+          if (i === currentStep) t.classList.add("active");
+          else if (i < currentStep) t.classList.add("done");
+        });
+      }
+
+      function goToStep(n) {
+        if (n > currentStep) return; // can't skip forward
+        document
+          .getElementById("step-" + currentStep)
+          .classList.remove("active");
+        currentStep = n;
+        document.getElementById("step-" + currentStep).classList.add("active");
+        updateTabs();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      function prevStep(from) {
+        document.getElementById("step-" + from).classList.remove("active");
+        currentStep = from - 1;
+        document.getElementById("step-" + currentStep).classList.add("active");
+        updateTabs();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      // ──────────────────────────────────────────────
+      // VALIDATION
+      // ──────────────────────────────────────────────
+      function required(fieldId, inputId) {
+        const val = document.getElementById(inputId).value.trim();
+        const fld = document.getElementById(fieldId);
+        if (!val) {
+          fld.classList.add("has-error");
+          return false;
+        }
+        fld.classList.remove("has-error");
+        return true;
+      }
+
+      function validateStep(step) {
+        let ok = true;
+        if (step === 0) {
+          ok =
+            required("f-palika-type", "palika-type") &
+              required("f-palika-name", "palika-name") &
+              required("f-district", "district") &
+              required("f-ward", "ward") &
+              required("f-mudda-type", "mudda-type") && ok;
+        } else if (step === 1) {
+          ok =
+            required("f-wadi-name", "wadi-name") &
+              required("f-wadi-parent", "wadi-parent") &
+              required("f-wadi-age", "wadi-age") &
+              required("f-wadi-address", "wadi-address") && ok;
+        } else if (step === 2) {
+          ok =
+            required("f-prativ-name", "prativ-name") &
+              required("f-prativ-parent", "prativ-parent") &
+              required("f-prativ-age", "prativ-age") &
+              required("f-prativ-address", "prativ-address") && ok;
+        } else if (step === 3) {
+          ok = required("f-farad-maag", "farad-maag") && ok;
+        }
+        return ok;
+      }
+
+      function nextStep(from) {
+        if (!validateStep(from)) return;
+        document.getElementById("step-" + from).classList.remove("active");
+        currentStep = from + 1;
+        if (currentStep === 5) buildReview();
+        document.getElementById("step-" + currentStep).classList.add("active");
+        updateTabs();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      // ──────────────────────────────────────────────
+      // DYNAMIC LIST HELPERS
+      // ──────────────────────────────────────────────
+      function getListVals(listId, isTextarea = false) {
+        const rows = document.querySelectorAll("#" + listId + " .dyn-row");
+        return Array.from(rows)
+          .map((r) => {
+            const el = isTextarea
+              ? r.querySelector("textarea")
+              : r.querySelector("input");
+            return el ? el.value.trim() : "";
+          })
+          .filter(Boolean);
+      }
+
+      function addRow(listId, placeholder, isTextarea = false) {
+        const list = document.getElementById(listId);
+        const idx = list.querySelectorAll(".dyn-row").length;
+        const label = NEPALI_LABELS[idx] || idx + 1;
+        const row = document.createElement("div");
+        row.className = "dyn-row";
+        row.innerHTML = `<div class="num-badge">${label}</div>
+    ${
+      isTextarea
+        ? `<textarea class="nepali-input" placeholder="${placeholder}" rows="3"></textarea>`
+        : `<input type="text" class="nepali-input" placeholder="${placeholder}">`
+    }
+    <button class="btn-remove" onclick="removeRow(this)" title="हटाउनुहोस्">×</button>`;
+        list.appendChild(row);
+      }
+
+      function removeRow(btn) {
+        const row = btn.closest(".dyn-row");
+        const list = row.parentElement;
+        if (list.querySelectorAll(".dyn-row").length > 1) {
+          row.remove();
+          // Re-number
+          list.querySelectorAll(".dyn-row").forEach((r, i) => {
+            r.querySelector(".num-badge").textContent =
+              NEPALI_LABELS[i] || i + 1;
+          });
+        }
+      }
+
+      function addComplaintRow() {
+        addRow("complaint-list", "अर्को बुँदा...", true);
+      }
+      function addEvidenceRow() {
+        addRow("evidence-list", "प्रमाणको नाम");
+      }
+      function addWitnessRow() {
+        addRow("witness-list", "पूरा नाम, उमेर र ठेगाना");
+      }
+      function addDasturRow() {
+        addRow("dastur-list", "दस्तुरको विवरण र रकम");
+      }
+
+      // ──────────────────────────────────────────────
+      // REVIEW BUILD
+      // ──────────────────────────────────────────────
+      function buildReview() {
+        const c = document.getElementById("review-content");
+        const complaints = getListVals("complaint-list", true);
+        const evidences = getListVals("evidence-list");
+        const witnesses = getListVals("witness-list");
+        const dasturList = getListVals("dastur-list");
+
+        c.innerHTML = `
+    <div class="review-block">
+      <h4>🏛️ दर्ता स्थान</h4>
+      <div class="review-row"><span class="rk">स्थानीय तह</span><span class="rv">${v("palika-name")} ${v("palika-type")}</span></div>
+      <div class="review-row"><span class="rk">जिल्ला/प्रदेश</span><span class="rv">${v("district")}${v("province") ? ", " + v("province") : ""}</span></div>
+      <div class="review-row"><span class="rk">वडा नं</span><span class="rv">${v("ward")}</span></div>
+      <div class="review-row"><span class="rk">मुद्दाको किसिम</span><span class="rv">${v("mudda-type")}</span></div>
+      <div class="review-row"><span class="rk">दायर मिति</span><span class="rv">सम्वत् ${v("bs-year")} साल ${v("bs-month")} महिना ${v("bs-day")} गते</span></div>
+    </div>
+    <div class="review-block">
+      <h4>👤 वादी</h4>
+      <div class="review-row"><span class="rk">नाम</span><span class="rv">${v("wadi-name")}</span></div>
+      <div class="review-row"><span class="rk">अभिभावक</span><span class="rv">${v("wadi-relation")} ${v("wadi-parent")}</span></div>
+      <div class="review-row"><span class="rk">उमेर / ठेगाना</span><span class="rv">${v("wadi-age")} वर्ष / ${v("wadi-address")}</span></div>
+      ${v("lawyer-name") ? `<div class="review-row"><span class="rk">वकिल</span><span class="rv">${v("lawyer-name")} (${v("lawyer-cert")})</span></div>` : ""}
+    </div>
+    <div class="review-block">
+      <h4>👥 प्रतिवादी</h4>
+      <div class="review-row"><span class="rk">नाम</span><span class="rv">${v("prativ-name")}</span></div>
+      <div class="review-row"><span class="rk">अभिभावक</span><span class="rv">${v("prativ-relation")} ${v("prativ-parent")}</span></div>
+      <div class="review-row"><span class="rk">उमेर / ठेगाना</span><span class="rv">${v("prativ-age")} वर्ष / ${v("prativ-address")}</span></div>
+      <div class="review-row"><span class="rk">म्याद तामेल</span><span class="rv">${v("myad")}</span></div>
+    </div>
+    <div class="review-block">
+      <h4>📋 फिरादको विषय</h4>
+      ${complaints.map((c, i) => `<div class="review-row"><span class="rk">${NEPALI_LABELS[i]}</span><span class="rv">${c}</span></div>`).join("")}
+      <div class="review-row" style="margin-top:10px;"><span class="rk">माग</span><span class="rv">${v("farad-maag")}</span></div>
+    </div>
+    ${
+      evidences.length
+        ? `<div class="review-block">
+      <h4>📁 प्रमाणहरू</h4>
+      ${evidences.map((e, i) => `<div class="review-row"><span class="rk">${NEPALI_LABELS[i]}</span><span class="rv">${e}</span></div>`).join("")}
+    </div>`
+        : ""
+    }
+    ${
+      witnesses.length
+        ? `<div class="review-block">
+      <h4>🧑‍⚖️ साक्षीहरू</h4>
+      ${witnesses.map((w, i) => `<div class="review-row"><span class="rk">${NEPALI_LABELS[i]}</span><span class="rv">${w}</span></div>`).join("")}
+    </div>`
+        : ""
+    }
+  `;
+      }
+
+      function v(id) {
+        const el = document.getElementById(id);
+        return el ? el.value.trim() : "";
+      }
+
+      // ──────────────────────────────────────────────
+      // DOCX GENERATION
+      // ──────────────────────────────────────────────
+      let generatedBlob = null;
+
+      async function generateDoc() {
+        const btn = document.getElementById("gen-btn");
+        btn.classList.add("generating");
+        btn.disabled = true;
+
+        await new Promise((r) => setTimeout(r, 100));
+
+        try {
+          const {
+            Document,
+            Packer,
+            Paragraph,
+            TextRun,
+            Table,
+            TableRow,
+            TableCell,
+            AlignmentType,
+            BorderStyle,
+            WidthType,
+            ShadingType,
+            VerticalAlign,
+            HeadingLevel,
+          } = docx;
+
+          const complaints = getListVals("complaint-list", true);
+          const evidences = getListVals("evidence-list");
+          const witnesses = getListVals("witness-list");
+          const dasturList = getListVals("dastur-list");
+
+          const palika = `${v("palika-name")} ${v("palika-type")}`;
+          const fDate = `सम्वत् ${v("bs-year")} साल ${v("bs-month")} महिना ${v("bs-day")} गते`;
+
+          // ── Style helpers ──────────────────────────
+          const FONT = "Preeti"; // fallback for Devanagari in older Word; also works with Unicode
+          const FONT_SIZE = 22; // 11pt
+
+          function para(text, opts = {}) {
+            return new Paragraph({
+              alignment: opts.center
+                ? AlignmentType.CENTER
+                : AlignmentType.BOTH,
+              spacing: {
+                before: opts.spaceBefore ?? 60,
+                after: opts.spaceAfter ?? 60,
+              },
+              children: [
+                new TextRun({
+                  text,
+                  font: "Noto Serif",
+                  size: opts.size ?? FONT_SIZE,
+                  bold: opts.bold ?? false,
+                  underline: opts.underline ? {} : undefined,
+                  color: opts.color ?? "000000",
+                }),
+              ],
+            });
+          }
+
+          function mixPara(runs, opts = {}) {
+            return new Paragraph({
+              alignment: opts.center
+                ? AlignmentType.CENTER
+                : AlignmentType.BOTH,
+              spacing: {
+                before: opts.spaceBefore ?? 80,
+                after: opts.spaceAfter ?? 80,
+              },
+              children: runs.map(
+                (r) =>
+                  new TextRun({
+                    text: r.text,
+                    font: "Noto Serif",
+                    size: r.size ?? FONT_SIZE,
+                    bold: r.bold ?? false,
+                    underline: r.underline ? {} : undefined,
+                  }),
+              ),
+            });
+          }
+
+          function borderLine() {
+            return new Paragraph({
+              spacing: { before: 80, after: 80 },
+              border: {
+                bottom: { style: BorderStyle.SINGLE, size: 4, color: "8B1A1A" },
+              },
+              children: [],
+            });
+          }
+
+          function sectionHeading(text) {
+            return new Paragraph({
+              alignment: AlignmentType.LEFT,
+              spacing: { before: 200, after: 80 },
+              children: [
+                new TextRun({
+                  text,
+                  font: "Noto Serif",
+                  size: 22,
+                  bold: true,
+                  underline: {},
+                }),
+              ],
+            });
+          }
+
+          function numberedPara(num, text) {
+            return new Paragraph({
+              alignment: AlignmentType.BOTH,
+              spacing: { before: 60, after: 60 },
+              indent: { left: 360, hanging: 360 },
+              children: [
+                new TextRun({
+                  text: num + ". ",
+                  font: "Noto Serif",
+                  size: FONT_SIZE,
+                  bold: true,
+                }),
+                new TextRun({ text, font: "Noto Serif", size: FONT_SIZE }),
+              ],
+            });
+          }
+
+          function bulletPara(label, text) {
+            return new Paragraph({
+              alignment: AlignmentType.BOTH,
+              spacing: { before: 50, after: 50 },
+              indent: { left: 600, hanging: 420 },
+              children: [
+                new TextRun({
+                  text: `(${label}) `,
+                  font: "Noto Serif",
+                  size: FONT_SIZE,
+                  bold: true,
+                }),
+                new TextRun({ text, font: "Noto Serif", size: FONT_SIZE }),
+              ],
+            });
+          }
+
+          function emptyPara() {
+            return new Paragraph({ children: [new TextRun("")] });
+          }
+
+          // ── Build document ─────────────────────────
+          const children = [];
+
+          // Header
+          children.push(
+            para(palika + "को न्यायिक कार्यसमितिमा दायर गरेको फिराद पत्र", {
+              center: true,
+              bold: true,
+              size: 26,
+              spaceAfter: 40,
+            }),
+            borderLine(),
+            emptyPara(),
+          );
+
+          // Court Office Section
+          children.push(
+            para("कार्यालयले भर्ने", { bold: true }),
+            mixPara([
+              { text: "दर्ता नं.: ", bold: true },
+              { text: "............................................" },
+              { text: "     दर्ता मिति: ", bold: true },
+              { text: ".................................." },
+            ]),
+            mixPara([
+              { text: "देवानी दावी नं.: ", bold: true },
+              { text: "..............     साल: " },
+              { text: v("bs-year") || "......" },
+            ]),
+            emptyPara(),
+          );
+
+          // Parties
+          children.push(
+            sectionHeading("वादी (Plaintiff)"),
+            mixPara([
+              { text: v("wadi-name") + " ", bold: true },
+              {
+                text:
+                  v("wadi-relation") +
+                  " " +
+                  v("wadi-parent") +
+                  ", बस्ने उमेर " +
+                  v("wadi-age") +
+                  " वर्ष, " +
+                  v("wadi-address"),
+              },
+            ]),
+            emptyPara(),
+            para("विरुद्ध", { center: true, bold: true, size: 24 }),
+            emptyPara(),
+            sectionHeading("प्रतिवादी (Defendant)"),
+            mixPara([
+              { text: v("prativ-name") + " ", bold: true },
+              {
+                text:
+                  v("prativ-relation") +
+                  " " +
+                  v("prativ-parent") +
+                  ", बस्ने उमेर " +
+                  v("prativ-age") +
+                  " वर्ष, " +
+                  v("prativ-address"),
+              },
+            ]),
+            emptyPara(),
+            borderLine(),
+            emptyPara(),
+            mixPara([
+              { text: "मुद्दाः ", bold: true },
+              { text: v("mudda-type") },
+            ]),
+            emptyPara(),
+          );
+
+          // Main body numbered points
+          children.push(
+            para(
+              "म/हामी फिरादपत्रवाला निम्न प्रकरणहरूमा लेखिए बमोजिम फिराद गर्दछु/गर्दछौँ।",
+              { spaceBefore: 120, spaceAfter: 80 },
+            ),
+          );
+
+          // Point 1 – complaint details
+          children.push(
+            para("१.  फिरादको विषयवस्तु, दावी गर्ने आधार र फिराद दावी:", {
+              bold: true,
+              spaceBefore: 100,
+            }),
+          );
+          complaints.forEach((c, i) => {
+            children.push(bulletPara(NEPALI_LABELS[i], c));
+          });
+          emptyPara();
+
+          // Point 2 – jurisdiction
+          children.push(
+            emptyPara(),
+            mixPara([
+              { text: "२.  ", bold: true },
+              {
+                text: "प्रस्तुत निवेदन स्थानीय सरकार संञ्चालन ऐन, २०७४ को दफा ४७ बमोजिम यो मुद्दा यसै न्यायिक कार्यसमितिको अधिकार क्षेत्र भित्र पर्दछ।",
+              },
+            ]),
+          );
+
+          // Point 3 – limitation
+          children.push(
+            mixPara([
+              { text: "३.  ", bold: true },
+              {
+                text:
+                  "फिराद गर्न " +
+                  (v("hadmyad") || "......") +
+                  " कानून बमोजिम हदम्याद रहेको छ।",
+              },
+            ]),
+          );
+
+          // Point 4 – not filed elsewhere
+          children.push(
+            mixPara([
+              { text: "४.  ", bold: true },
+              {
+                text:
+                  "प्रस्तुत विषयमा अन्यत्र फिराद गरेको " + v("anyatra") + "।",
+              },
+            ]),
+          );
+
+          // Point 5 – summons
+          children.push(
+            mixPara([
+              { text: "५.  ", bold: true },
+              {
+                text:
+                  "प्रतिवादीलाई " +
+                  v("myad") +
+                  " म्याद तामेल गर्ने व्यवस्था गरी पाऊँ।",
+              },
+            ]),
+          );
+
+          // Point 6 – lawyer (if any)
+          if (v("lawyer-name")) {
+            children.push(
+              para("६.  कानून व्यवसायी नियुक्त गरेको विवरणः", { bold: true }),
+              bulletPara(
+                "क",
+                "नाम: " +
+                  v("lawyer-name") +
+                  "     प्रमाणपत्र नं: " +
+                  (v("lawyer-cert") || "........"),
+              ),
+            );
+          } else {
+            children.push(
+              mixPara([
+                { text: "६.  ", bold: true },
+                { text: "कानून व्यवसायी नियुक्त गरेको छैन।" },
+              ]),
+            );
+          }
+
+          // Point 7 – fees
+          children.push(
+            para("७.  देहायको दस्तुर यसैसाथ बुझाउन ल्याएको छु/छौँः", {
+              bold: true,
+            }),
+          );
+          if (dasturList.length) {
+            dasturList.forEach((d, i) =>
+              children.push(bulletPara(NEPALI_LABELS[i], d)),
+            );
+          } else {
+            children.push(
+              bulletPara(
+                "क",
+                v("dastur") ? v("dastur") : "दर्ता दस्तुर बापत रु. ..........",
+              ),
+            );
+          }
+
+          // Point 8 – evidence
+          children.push(
+            para("८.  फिरादको दाबीलाई पुष्टि गर्ने प्रमाणः", { bold: true }),
+          );
+          children.push(
+            para(
+              "यस विषयमा देहायको प्रमाण सम्बन्धी कागजातको प्रतिलिपि संलग्न गरेको छु/छौँः",
+            ),
+          );
+          if (evidences.length) {
+            evidences.forEach((e, i) =>
+              children.push(bulletPara(NEPALI_LABELS[i], e)),
+            );
+          } else {
+            children.push(bulletPara("क", "(कागजातहरू संलग्न)"));
+          }
+
+          // Point 9 – witnesses
+          children.push(para("९.  साक्षीः", { bold: true }));
+          if (witnesses.length) {
+            witnesses.forEach((w, i) =>
+              children.push(bulletPara(NEPALI_LABELS[i], w)),
+            );
+          } else {
+            children.push(
+              bulletPara(
+                "क",
+                "(साक्षीको पूरा नाम, उमेर र ठेगाना उल्लेख गर्ने)",
+              ),
+            );
+          }
+
+          // माग
+          children.push(
+            emptyPara(),
+            sectionHeading("फिरादको माग (Relief Sought)"),
+            para(v("farad-maag"), { spaceBefore: 80 }),
+          );
+
+          // Certification
+          children.push(
+            emptyPara(),
+            para(
+              "१०. यसमा लेखिएको व्यहोरा ठीक साँचो छ, झुट्टा ठहरे कानून बमोजिम सहँदा बुझाउँला।",
+              { bold: true, spaceBefore: 160 },
+            ),
+            emptyPara(),
+            emptyPara(),
+          );
+
+          // Signature block
+          children.push(
+            mixPara([
+              {
+                text: "                                                    .................................................................",
+              },
+            ]),
+            mixPara(
+              [
+                {
+                  text: "                                                    फिरादपत्रवालाको दस्तखत र सङ्गठित संस्था भए संस्थाको छाप",
+                },
+              ],
+              { center: false },
+            ),
+            emptyPara(),
+            mixPara([
+              { text: "इति सम्वत् ", bold: false },
+              { text: v("bs-year"), bold: true },
+              { text: " साल ", bold: false },
+              { text: v("bs-month"), bold: true },
+              { text: " महिना ", bold: false },
+              { text: v("bs-day"), bold: true },
+              { text: " गते शुभम्।।", bold: false },
+            ]),
+          );
+
+          const doc = new Document({
+            sections: [
+              {
+                properties: {
+                  page: {
+                    size: { width: 11906, height: 16838 }, // A4
+                    margin: {
+                      top: 1134,
+                      right: 1134,
+                      bottom: 1134,
+                      left: 1134,
+                    }, // ~2cm
+                  },
+                },
+                children,
+              },
+            ],
+          });
+
+          const buffer = await Packer.toBlob(doc);
+          generatedBlob = buffer;
+
+          // Show success
+          document.getElementById("step-5").classList.remove("active");
+          document.getElementById("step-success").classList.add("active");
+
+          document.getElementById("dl-btn").onclick = () => {
+            saveAs(
+              generatedBlob,
+              `फिराद_पत्र_${v("wadi-name") || "document"}.docx`,
+            );
+          };
+        } catch (e) {
+          console.error(e);
+          alert("त्रुटि भयो / Error: " + e.message);
+          btn.classList.remove("generating");
+          btn.disabled = false;
+        }
+      }
+
+      function resetForm() {
+        location.reload();
+      }
+    </script>
+  </body>
+</html>
